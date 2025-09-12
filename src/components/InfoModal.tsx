@@ -12,7 +12,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose }) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="p-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800">
-          About Restore Vote
+          About
         </h2>
         <p className="text-gray-600 mb-6 leading-relaxed">
           This platform displays policies from Restore Britain's voting platform, 
@@ -38,7 +38,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose }) => {
             <span className="font-medium text-blue-800">Go to PolicyVoter</span>
           </a>
           <a
-            href="https://restorebritain.org.uk"
+            href="https://www.restorebritain.org.uk/"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"

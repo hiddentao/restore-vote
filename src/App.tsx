@@ -61,7 +61,7 @@ function App() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold text-gray-900">Restore Vote</h1>
+              <h1 className="text-3xl font-bold text-gray-900">RestoreBritain Policy Votes</h1>
               <button
                 onClick={() => setShowInfoModal(true)}
                 className="text-gray-500 hover:text-blue-600 transition-colors"

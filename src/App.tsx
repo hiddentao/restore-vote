@@ -60,15 +60,15 @@ function App() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold text-gray-900">Restore Britain policies</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Restore Britain policies{' '}
               <button
                 onClick={() => setShowInfoModal(true)}
-                className="text-gray-500 hover:text-blue-600 transition-colors"
+                className="text-gray-500 hover:text-blue-600 transition-colors inline-block align-middle"
               >
                 <HelpCircle size={24} />
               </button>
-            </div>
+            </h1>
             <div className="text-sm text-gray-600">
               {loading ? 'Loading...' : `${policies.length} policies found`}
             </div>

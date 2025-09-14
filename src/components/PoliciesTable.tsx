@@ -9,7 +9,7 @@ interface PoliciesTableProps {
   onPolicyClick: (policy: Policy) => void;
 }
 
-type SortColumn = 'rank' | 'created' | 'votes' | null;
+type SortColumn = 'rank' | 'created' | 'votes';
 type SortDirection = 'asc' | 'desc';
 
 export function PoliciesTable({ policies, loading, onPolicyClick }: PoliciesTableProps) {
@@ -19,15 +19,7 @@ export function PoliciesTable({ policies, loading, onPolicyClick }: PoliciesTabl
   
   const handleColumnClick = (column: SortColumn) => {
     if (sortColumn === column) {
-      if (sortDirection === 'desc') {
-        setSortDirection('asc');
-      } else if (sortDirection === 'asc') {
-        if (column === 'rank') {
-          setSortDirection('desc');
-        } else {
-          setSortColumn(null);
-        }
-      }
+      setSortDirection(sortDirection === 'desc' ? 'asc' : 'desc');
     } else {
       setSortColumn(column);
       setSortDirection('desc');
@@ -51,10 +43,6 @@ export function PoliciesTable({ policies, loading, onPolicyClick }: PoliciesTabl
         policy.creator.username.toLowerCase().includes(term) ||
         policy.category.name.toLowerCase().includes(term)
       );
-    }
-    
-    if (!sortColumn) {
-      return filtered.sort((a, b) => (a.rank || 0) - (b.rank || 0));
     }
     
     return [...filtered].sort((a, b) => {

@@ -47,7 +47,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose }) => {
             <span className="font-medium text-gray-800">Learn about Restore Britain</span>
           </a>
           <a
-            href="mailto:hello@halfatheist.com"
+            href="https://x.com/halfatheist"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"

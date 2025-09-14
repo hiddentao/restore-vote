@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
-import { Search } from 'lucide-react';
+import { Search, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 import { Policy } from '../types/Policy';
 
 interface PoliciesTableProps {
@@ -8,21 +9,75 @@ interface PoliciesTableProps {
   onPolicyClick: (policy: Policy) => void;
 }
 
+type SortColumn = 'rank' | 'created' | 'votes' | null;
+type SortDirection = 'asc' | 'desc';
+
 export function PoliciesTable({ policies, loading, onPolicyClick }: PoliciesTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortColumn, setSortColumn] = useState<SortColumn>('rank');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   
-  const filteredPolicies = useMemo(() => {
-    if (!searchTerm.trim()) {
-      return policies;
+  const handleColumnClick = (column: SortColumn) => {
+    if (sortColumn === column) {
+      if (sortDirection === 'desc') {
+        setSortDirection('asc');
+      } else if (sortDirection === 'asc') {
+        if (column === 'rank') {
+          setSortDirection('desc');
+        } else {
+          setSortColumn(null);
+        }
+      }
+    } else {
+      setSortColumn(column);
+      setSortDirection('desc');
+    }
+  };
+
+  const getSortIcon = (column: SortColumn) => {
+    if (sortColumn !== column) {
+      return <ChevronsUpDown size={16} className="text-gray-400" />;
+    }
+    return sortDirection === 'desc' ? <ChevronDown size={16} /> : <ChevronUp size={16} />;
+  };
+  
+  const filteredAndSortedPolicies = useMemo(() => {
+    let filtered = policies;
+    
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+      filtered = policies.filter(policy => 
+        policy.title.toLowerCase().includes(term) ||
+        policy.creator.username.toLowerCase().includes(term) ||
+        policy.category.name.toLowerCase().includes(term)
+      );
     }
     
-    const term = searchTerm.toLowerCase();
-    return policies.filter(policy => 
-      policy.title.toLowerCase().includes(term) ||
-      policy.creator.username.toLowerCase().includes(term) ||
-      policy.category.name.toLowerCase().includes(term)
-    );
-  }, [policies, searchTerm]);
+    if (!sortColumn) {
+      return filtered.sort((a, b) => (a.rank || 0) - (b.rank || 0));
+    }
+    
+    return [...filtered].sort((a, b) => {
+      let aValue: number;
+      let bValue: number;
+      
+      if (sortColumn === 'rank') {
+        aValue = a.rank || 0;
+        bValue = b.rank || 0;
+      } else if (sortColumn === 'created') {
+        aValue = a.createdAt;
+        bValue = b.createdAt;
+      } else if (sortColumn === 'votes') {
+        aValue = a.totalVotes;
+        bValue = b.totalVotes;
+      } else {
+        return 0;
+      }
+      
+      const result = aValue - bValue;
+      return sortDirection === 'asc' ? result : -result;
+    });
+  }, [policies, searchTerm, sortColumn, sortDirection]);
 
   if (loading) {
     return (
@@ -55,8 +110,14 @@ export function PoliciesTable({ policies, loading, onPolicyClick }: PoliciesTabl
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Rank
+                <th 
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 hover:text-blue-600 select-none border-b border-dotted border-gray-300"
+                  onClick={() => handleColumnClick('rank')}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Rank</span>
+                    {getSortIcon('rank')}
+                  </div>
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Policy
@@ -67,20 +128,35 @@ export function PoliciesTable({ policies, loading, onPolicyClick }: PoliciesTabl
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Username
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Total Votes
+                <th 
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 hover:text-blue-600 select-none border-b border-dotted border-gray-300"
+                  onClick={() => handleColumnClick('created')}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Created</span>
+                    {getSortIcon('created')}
+                  </div>
+                </th>
+                <th 
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 hover:text-blue-600 select-none border-b border-dotted border-gray-300"
+                  onClick={() => handleColumnClick('votes')}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Total Votes</span>
+                    {getSortIcon('votes')}
+                  </div>
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredPolicies.length === 0 ? (
+              {filteredAndSortedPolicies.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                     {searchTerm ? 'No policies found matching your search.' : 'No policies available.'}
                   </td>
                 </tr>
               ) : (
-                filteredPolicies.map((policy) => (
+                filteredAndSortedPolicies.map((policy) => (
                   <tr
                     key={policy.policyId}
                     onClick={() => onPolicyClick(policy)}
@@ -102,6 +178,9 @@ export function PoliciesTable({ policies, loading, onPolicyClick }: PoliciesTabl
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {policy.creator.username}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {formatDistanceToNow(new Date(policy.createdAt * 1000), { addSuffix: true })}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {policy.totalVotes.toLocaleString()}
                     </td>
@@ -112,10 +191,10 @@ export function PoliciesTable({ policies, loading, onPolicyClick }: PoliciesTabl
           </table>
         </div>
         
-        {filteredPolicies.length > 0 && (
+        {filteredAndSortedPolicies.length > 0 && (
           <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
             <div className="text-sm text-gray-700">
-              Showing {filteredPolicies.length} of {policies.length} policies
+              Showing {filteredAndSortedPolicies.length} of {policies.length} policies
               {searchTerm && (
                 <span className="ml-2 text-blue-600">
                   (filtered by "{searchTerm}")

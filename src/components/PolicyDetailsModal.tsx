@@ -47,7 +47,7 @@ export function PolicyDetailsModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="p-6 pb-20">
+      <div className="p-6">
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
             <span className="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">

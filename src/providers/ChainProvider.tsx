@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useEffect, useState } from "react"
+import { Analytics } from "../analytics"
 import { chainApiService } from "../services/chainApi"
 import { policyApiService } from "../services/policyApi"
 import {
@@ -135,6 +136,12 @@ export const ChainProvider: React.FC<ChainProviderProps> = ({ children }) => {
           address,
           data: profileData as PolicyVoterUserData,
         })
+
+        // Identify user with analytics
+        const userData = profileData as PolicyVoterUserData
+        if (userData.username) {
+          Analytics.setUser(userData.username, address)
+        }
       } catch (profileError) {
         console.error(
           "Failed to fetch user profile from PolicyVoter API:",

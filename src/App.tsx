@@ -1,6 +1,6 @@
-import LogRocket from "logrocket"
 import { HelpCircle } from "lucide-react"
 import { useState } from "react"
+import { Analytics } from "./analytics"
 import { InfoModal } from "./components/InfoModal"
 import { LoginButton } from "./components/LoginButton"
 import { PoliciesTable } from "./components/PoliciesTable"
@@ -10,7 +10,7 @@ import { ApiProvider } from "./providers/ApiProvider"
 import { ChainProvider } from "./providers/ChainProvider"
 import { Policy } from "./types/Policy"
 
-LogRocket.init("zjtinw/restore-vote")
+Analytics.init()
 
 function AppContent() {
   const { policies, loading, isRefreshing, lastUpdated, error } = usePolicies()

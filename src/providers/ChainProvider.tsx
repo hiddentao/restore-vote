@@ -43,6 +43,7 @@ export const ChainProvider: React.FC<ChainProviderProps> = ({ children }) => {
   )
   const [voteStatusCacheVersion, setVoteStatusCacheVersion] = useState(0)
   const [checkingVotes, setCheckingVotes] = useState<Set<string>>(new Set())
+  const [votingPolicies, setVotingPolicies] = useState<Set<string>>(new Set())
 
   const checkUserVote = useCallback(
     async (policyId: string) => {
@@ -100,6 +101,89 @@ export const ChainProvider: React.FC<ChainProviderProps> = ({ children }) => {
       return checkingVotes.has(policyId)
     },
     [checkingVotes],
+  )
+
+  const isVoting = useCallback(
+    (policyId: string): boolean => {
+      return votingPolicies.has(policyId)
+    },
+    [votingPolicies],
+  )
+
+  const voteForPolicy = useCallback(
+    async (policyId: string) => {
+      if (
+        !walletState.isConnected ||
+        !walletState.address ||
+        votingPolicies.has(policyId)
+      ) {
+        return
+      }
+
+      // Add to voting set
+      setVotingPolicies((prev) => new Set(prev).add(policyId))
+
+      try {
+        await chainApiService.voteForPolicy(policyId)
+
+        // Update cache to reflect the vote
+        setVoteStatusCache((prev) => {
+          const newCache = new Map(prev)
+          newCache.set(policyId, true)
+          return newCache
+        })
+        // Increment version to notify listeners
+        setVoteStatusCacheVersion((prev) => prev + 1)
+      } catch (error) {
+        console.error(`Failed to vote for policy ${policyId}:`, error)
+      } finally {
+        // Remove from voting set
+        setVotingPolicies((prev) => {
+          const newSet = new Set(prev)
+          newSet.delete(policyId)
+          return newSet
+        })
+      }
+    },
+    [walletState.isConnected, walletState.address, votingPolicies],
+  )
+
+  const undoVoteForPolicy = useCallback(
+    async (policyId: string) => {
+      if (
+        !walletState.isConnected ||
+        !walletState.address ||
+        votingPolicies.has(policyId)
+      ) {
+        return
+      }
+
+      // Add to voting set
+      setVotingPolicies((prev) => new Set(prev).add(policyId))
+
+      try {
+        await chainApiService.undoVoteForPolicy(policyId)
+
+        // Update cache to reflect the removed vote
+        setVoteStatusCache((prev) => {
+          const newCache = new Map(prev)
+          newCache.set(policyId, false)
+          return newCache
+        })
+        // Increment version to notify listeners
+        setVoteStatusCacheVersion((prev) => prev + 1)
+      } catch (error) {
+        console.error(`Failed to remove vote for policy ${policyId}:`, error)
+      } finally {
+        // Remove from voting set
+        setVotingPolicies((prev) => {
+          const newSet = new Set(prev)
+          newSet.delete(policyId)
+          return newSet
+        })
+      }
+    },
+    [walletState.isConnected, walletState.address, votingPolicies],
   )
 
   const login = useCallback(async (mnemonic: string) => {
@@ -200,6 +284,7 @@ export const ChainProvider: React.FC<ChainProviderProps> = ({ children }) => {
     setVoteStatusCache(new Map())
     setVoteStatusCacheVersion(0)
     setCheckingVotes(new Set())
+    setVotingPolicies(new Set())
   }, [])
 
   // Auto-login on component mount
@@ -216,6 +301,9 @@ export const ChainProvider: React.FC<ChainProviderProps> = ({ children }) => {
     getVoteStatus,
     isCheckingVote,
     voteStatusCacheVersion,
+    voteForPolicy,
+    undoVoteForPolicy,
+    isVoting,
   }
 
   return <ChainContext.Provider value={value}>{children}</ChainContext.Provider>

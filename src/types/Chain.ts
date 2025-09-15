@@ -27,4 +27,7 @@ export interface ChainContextType {
   getVoteStatus: (policyId: string) => boolean | undefined
   isCheckingVote: (policyId: string) => boolean
   voteStatusCacheVersion: number
+  voteForPolicy: (policyId: string) => Promise<void>
+  undoVoteForPolicy: (policyId: string) => Promise<void>
+  isVoting: (policyId: string) => boolean
 }

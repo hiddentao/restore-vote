@@ -8,8 +8,22 @@ export class Analytics {
       return
     }
 
+    if (this.isLocalhost()) {
+      console.log("Analytics disabled for localhost")
+      this.initialized = true
+      return
+    }
+
     LogRocket.init("zjtinw/restore-vote")
     this.initialized = true
+  }
+
+  private static isLocalhost(): boolean {
+    return (
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1" ||
+      window.location.hostname.startsWith("localhost:")
+    )
   }
 
   static setUser(username: string, walletAddress: string): void {

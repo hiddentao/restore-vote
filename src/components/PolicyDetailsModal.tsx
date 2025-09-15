@@ -1,5 +1,7 @@
-import { CheckCircle } from "lucide-react"
+import { Check, CheckCircle, X } from "lucide-react"
+import { useChain } from "../hooks/useChain"
 import { Policy } from "../types/Policy"
+import { Button } from "./Button"
 import { Modal } from "./Modal"
 
 interface PolicyDetailsModalProps {
@@ -13,7 +15,27 @@ export function PolicyDetailsModal({
   isOpen,
   onClose,
 }: PolicyDetailsModalProps) {
+  const {
+    walletState,
+    voteForPolicy,
+    undoVoteForPolicy,
+    getVoteStatus,
+    isVoting,
+  } = useChain()
+
   if (!policy) return null
+
+  const userVoteStatus = getVoteStatus(policy.policyId)
+  const isVotingForThis = isVoting(policy.policyId)
+  const isLoggedIn = walletState.isConnected
+
+  const handleVote = async () => {
+    await voteForPolicy(policy.policyId)
+  }
+
+  const handleUndoVote = async () => {
+    await undoVoteForPolicy(policy.policyId)
+  }
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp * 1000).toLocaleDateString("en-GB", {
@@ -25,7 +47,7 @@ export function PolicyDetailsModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="p-6">
+      <div className="p-6 pb-20">
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
             <span className="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
@@ -38,7 +60,7 @@ export function PolicyDetailsModal({
           <h2 className="text-xl font-bold text-gray-900 mb-2 mt-3">
             {policy.title}
           </h2>
-          {policy.hasUserVoted && (
+          {isLoggedIn && userVoteStatus === true && (
             <div className="flex items-center gap-2 mb-3 p-3 bg-green-50 border border-green-200 rounded-lg">
               <CheckCircle size={20} className="text-green-600" />
               <span className="text-green-800 font-medium">
@@ -70,6 +92,34 @@ export function PolicyDetailsModal({
           </div>
         </div>
       </div>
+
+      {/* Fixed Floating Vote Button - positioned relative to modal container */}
+      {/* Temporarily hidden until contract writing is working */}
+      {false && isLoggedIn && userVoteStatus !== undefined && (
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10">
+          {userVoteStatus === false ? (
+            <Button
+              onClick={handleVote}
+              disabled={isVotingForThis}
+              variant="success"
+              icon={<Check size={18} />}
+              title="Vote for this policy"
+            >
+              {isVotingForThis ? "Voting..." : "Vote for this"}
+            </Button>
+          ) : (
+            <Button
+              onClick={handleUndoVote}
+              disabled={isVotingForThis}
+              variant="danger"
+              icon={<X size={18} />}
+              title="Remove your vote"
+            >
+              {isVotingForThis ? "Removing..." : "Retract my vote"}
+            </Button>
+          )}
+        </div>
+      )}
     </Modal>
   )
 }

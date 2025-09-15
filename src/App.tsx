@@ -1,5 +1,6 @@
 import { HelpCircle } from "lucide-react"
 import { useState } from "react"
+import { Toaster } from "react-hot-toast"
 import { Analytics } from "./analytics"
 import { InfoModal } from "./components/InfoModal"
 import { LoginButton } from "./components/LoginButton"
@@ -108,6 +109,16 @@ function App() {
     <ChainProvider>
       <ApiProvider>
         <AppContent />
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: "#333",
+              color: "#fff",
+            },
+          }}
+        />
       </ApiProvider>
     </ChainProvider>
   )

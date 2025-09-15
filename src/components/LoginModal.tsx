@@ -45,10 +45,18 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           Login with Wallet
         </h2>
 
-        <p className="text-sm text-gray-600 mb-6">
+        <p className="text-sm text-gray-600 mb-4">
           Enter your 12-word mnemonic phrase that you obtained from PolicyVoter
           to access your account.
         </p>
+
+        <div className="mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-xs text-yellow-800">
+            <strong>Security Notice:</strong> Your mnemonic will be stored
+            locally in your browser for automatic login. Only use this on
+            trusted devices.
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">

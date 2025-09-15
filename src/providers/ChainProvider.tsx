@@ -1,8 +1,22 @@
-import React, { createContext, useCallback, useState } from "react"
+import React, { createContext, useCallback, useEffect, useState } from "react"
 import { chainApiService } from "../services/chainApi"
 import { ChainContextType, UserProfile, WalletState } from "../types/Chain"
 
 export const ChainContext = createContext<ChainContextType | null>(null)
+
+const MNEMONIC_STORAGE_KEY = "restore-vote-mnemonic"
+
+const encodeMnemonic = (mnemonic: string): string => {
+  return btoa(mnemonic)
+}
+
+const decodeMnemonic = (encoded: string): string => {
+  try {
+    return atob(encoded)
+  } catch {
+    throw new Error("Invalid stored mnemonic")
+  }
+}
 
 interface ChainProviderProps {
   children: React.ReactNode
@@ -24,6 +38,13 @@ export const ChainProvider: React.FC<ChainProviderProps> = ({ children }) => {
     try {
       // Generate wallet from mnemonic
       const address = await chainApiService.generateWalletFromMnemonic(mnemonic)
+
+      // Save mnemonic to localStorage after successful wallet generation
+      try {
+        localStorage.setItem(MNEMONIC_STORAGE_KEY, encodeMnemonic(mnemonic))
+      } catch (storageError) {
+        console.warn("Could not save mnemonic to localStorage:", storageError)
+      }
 
       // Update wallet state
       setWalletState({
@@ -54,7 +75,28 @@ export const ChainProvider: React.FC<ChainProviderProps> = ({ children }) => {
     }
   }, [])
 
+  const initializeWallet = useCallback(async () => {
+    try {
+      const storedMnemonic = localStorage.getItem(MNEMONIC_STORAGE_KEY)
+      if (storedMnemonic) {
+        const mnemonic = decodeMnemonic(storedMnemonic)
+        await login(mnemonic)
+      }
+    } catch (error) {
+      console.warn("Could not auto-login from stored mnemonic:", error)
+      // Clear invalid stored data
+      localStorage.removeItem(MNEMONIC_STORAGE_KEY)
+    }
+  }, [login])
+
   const logout = useCallback(() => {
+    // Clear stored mnemonic
+    try {
+      localStorage.removeItem(MNEMONIC_STORAGE_KEY)
+    } catch (storageError) {
+      console.warn("Could not clear stored mnemonic:", storageError)
+    }
+
     chainApiService.disconnect()
     setWalletState({
       isConnected: false,
@@ -64,6 +106,11 @@ export const ChainProvider: React.FC<ChainProviderProps> = ({ children }) => {
     })
     setUserProfile(null)
   }, [])
+
+  // Auto-login on component mount
+  useEffect(() => {
+    initializeWallet()
+  }, [initializeWallet])
 
   const value: ChainContextType = {
     walletState,

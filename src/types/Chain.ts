@@ -5,9 +5,17 @@ export interface WalletState {
   error: string | null
 }
 
+export interface PolicyVoterUserData {
+  username?: string
+  email?: string
+  avatar?: string
+  // Add other fields as needed based on API response
+  [key: string]: any
+}
+
 export interface UserProfile {
   address: string
-  data: unknown // Will contain the smart contract response data
+  data: PolicyVoterUserData
 }
 
 export interface ChainContextType {

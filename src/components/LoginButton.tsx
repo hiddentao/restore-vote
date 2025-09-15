@@ -1,24 +1,14 @@
 import { LogIn, LogOut } from "lucide-react"
 import React, { useState } from "react"
-import { createAvatar } from "web3-avatar"
 import { useChain } from "../hooks/useChain"
+import { Avatar } from "./Avatar"
 import { LoginModal } from "./LoginModal"
+import { UserProfileModal } from "./UserProfileModal"
 
 export const LoginButton: React.FC = () => {
-  const { walletState, logout } = useChain()
+  const { walletState, userProfile, logout } = useChain()
   const [showLoginModal, setShowLoginModal] = useState(false)
-  const [avatarRef, setAvatarRef] = useState<HTMLDivElement | null>(null)
-
-  // Generate avatar when wallet is connected
-  React.useEffect(() => {
-    if (walletState.isConnected && walletState.address && avatarRef) {
-      try {
-        createAvatar(avatarRef, walletState.address)
-      } catch (error) {
-        console.warn("Could not generate avatar:", error)
-      }
-    }
-  }, [walletState.isConnected, walletState.address, avatarRef])
+  const [showProfileModal, setShowProfileModal] = useState(false)
 
   const handleLoginClick = () => {
     setShowLoginModal(true)
@@ -32,24 +22,49 @@ export const LoginButton: React.FC = () => {
     setShowLoginModal(false)
   }
 
+  const handleUsernameClick = () => {
+    setShowProfileModal(true)
+  }
+
+  const handleCloseProfileModal = () => {
+    setShowProfileModal(false)
+  }
+
   if (walletState.isConnected) {
+    const username = userProfile?.data?.username
+    const displayText =
+      username ||
+      `${walletState.address?.slice(0, 6)}...${walletState.address?.slice(-4)}`
+
     return (
-      <div className="flex items-center gap-2">
-        <div
-          ref={setAvatarRef}
-          className="w-8 h-8 rounded-full overflow-hidden"
-        />
-        <span className="text-sm text-gray-600 hidden sm:block">
-          {walletState.address?.slice(0, 6)}...{walletState.address?.slice(-4)}
-        </span>
-        <button
-          onClick={handleLogoutClick}
-          className="flex items-center gap-2 px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-        >
-          <LogOut size={16} />
-          <span className="hidden sm:block">Logout</span>
-        </button>
-      </div>
+      <>
+        <div className="flex items-center gap-2">
+          <button onClick={handleUsernameClick} className="rounded-full">
+            <Avatar username={username} size="sm" />
+          </button>
+          <button
+            onClick={handleUsernameClick}
+            className="text-sm text-gray-600 hover:text-gray-800 hidden sm:block transition-colors cursor-pointer"
+          >
+            {displayText}
+          </button>
+          <button
+            onClick={handleLogoutClick}
+            className="flex items-center gap-2 px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            <LogOut size={16} />
+            <span className="hidden sm:block">Logout</span>
+          </button>
+        </div>
+
+        {userProfile && (
+          <UserProfileModal
+            isOpen={showProfileModal}
+            onClose={handleCloseProfileModal}
+            userProfile={userProfile}
+          />
+        )}
+      </>
     )
   }
 

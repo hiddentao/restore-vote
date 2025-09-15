@@ -1,6 +1,12 @@
 import React, { createContext, useCallback, useEffect, useState } from "react"
 import { chainApiService } from "../services/chainApi"
-import { ChainContextType, UserProfile, WalletState } from "../types/Chain"
+import { policyApiService } from "../services/policyApi"
+import {
+  ChainContextType,
+  PolicyVoterUserData,
+  UserProfile,
+  WalletState,
+} from "../types/Chain"
 
 export const ChainContext = createContext<ChainContextType | null>(null)
 
@@ -46,24 +52,40 @@ export const ChainProvider: React.FC<ChainProviderProps> = ({ children }) => {
         console.warn("Could not save mnemonic to localStorage:", storageError)
       }
 
-      // Update wallet state
-      setWalletState({
-        isConnected: true,
-        address,
-        isLoading: false,
-        error: null,
-      })
-
-      // Fetch user profile from smart contract
+      // Fetch user profile from PolicyVoter API - this is required for login
       try {
-        const profileData = await chainApiService.fetchUserProfile(address)
+        const authData = await chainApiService.signPolicyVoterAuth()
+        const profileData = await policyApiService.fetchUserProfile(
+          authData.address,
+          authData.signature,
+        )
+
+        // Update wallet state only after successful profile fetch
+        setWalletState({
+          isConnected: true,
+          address,
+          isLoading: false,
+          error: null,
+        })
+
         setUserProfile({
           address,
-          data: profileData,
+          data: profileData as PolicyVoterUserData,
         })
       } catch (profileError) {
-        console.warn("Could not fetch user profile:", profileError)
-        // Don't fail login if profile fetch fails
+        console.error(
+          "Failed to fetch user profile from PolicyVoter API:",
+          profileError,
+        )
+        // Disconnect wallet since profile fetch is required
+        chainApiService.disconnect()
+        setWalletState({
+          isConnected: false,
+          address: null,
+          isLoading: false,
+          error: "Failed to authenticate with PolicyVoter. Please try again.",
+        })
+        throw new Error("Failed to authenticate with PolicyVoter")
       }
     } catch (error) {
       setWalletState({

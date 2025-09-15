@@ -1,21 +1,14 @@
-import { createPublicClient, createWalletClient, http } from "viem"
+import { createWalletClient, http } from "viem"
 import { mnemonicToAccount } from "viem/accounts"
 import { mainnet } from "viem/chains"
-import { RPC_URL, VOTING_CONTRACT_ADDRESS } from "../constants"
-
-// Function selector for user profile function (0xa87430ba)
-const USER_PROFILE_FUNCTION = "0xa87430ba"
+import { RPC_URL } from "../constants"
 
 export class ChainApiService {
-  private publicClient: ReturnType<typeof createPublicClient>
   private walletClient?: ReturnType<typeof createWalletClient>
   private account?: ReturnType<typeof mnemonicToAccount>
 
   constructor() {
-    this.publicClient = createPublicClient({
-      chain: mainnet,
-      transport: http(RPC_URL),
-    })
+    // Public client removed as it's no longer needed for user profile fetching
   }
 
   /**
@@ -41,25 +34,41 @@ export class ChainApiService {
   }
 
   /**
-   * Fetch user profile data from smart contract
+   * Sign a personal message using the wallet
    */
-  async fetchUserProfile(walletAddress: string): Promise<unknown> {
+  async signMessage(message: string): Promise<string> {
+    if (!this.walletClient || !this.account) {
+      throw new Error("Wallet not connected")
+    }
+
     try {
-      if (!this.publicClient) {
-        throw new Error("Public client not initialized")
-      }
-
-      // Call the smart contract function with the wallet address
-      const result = await this.publicClient.call({
-        to: VOTING_CONTRACT_ADDRESS,
-        data: `${USER_PROFILE_FUNCTION}${walletAddress.slice(2).padStart(64, "0")}`,
+      const signature = await this.walletClient.signMessage({
+        account: this.account,
+        message,
       })
-
-      console.log("User profile data from smart contract:", result)
-      return result
+      return signature
     } catch (error) {
-      console.error("Error fetching user profile:", error)
-      throw new Error("Failed to fetch user profile from smart contract")
+      console.error("Error signing message:", error)
+      throw new Error("Failed to sign message")
+    }
+  }
+
+  /**
+   * Sign PolicyVoter authentication message
+   */
+  async signPolicyVoterAuth(): Promise<{ address: string; signature: string }> {
+    if (!this.account) {
+      throw new Error("Wallet not connected")
+    }
+
+    const address = this.account.address
+    const message = `Welcome to PolicyVoter. I am signing my wallet address: ${address}`
+
+    const signature = await this.signMessage(message)
+
+    return {
+      address,
+      signature,
     }
   }
 

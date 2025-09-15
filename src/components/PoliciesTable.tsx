@@ -91,6 +91,14 @@ export function PoliciesTable({ policies, loading, onPolicyClick }: PoliciesTabl
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
+        <div className="mt-3 text-sm text-gray-700">
+          Showing {filteredAndSortedPolicies.length} of {policies.length} policies
+          {searchTerm && (
+            <span className="ml-2 text-blue-600">
+              (filtered by "{searchTerm}")
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">

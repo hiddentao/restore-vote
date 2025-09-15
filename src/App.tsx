@@ -59,20 +59,15 @@ function App() {
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Restore Britain policies{' '}
-              <button
-                onClick={() => setShowInfoModal(true)}
-                className="text-gray-500 hover:text-blue-600 transition-colors inline-block align-middle"
-              >
-                <HelpCircle size={24} />
-              </button>
-            </h1>
-            <div className="text-sm text-gray-600">
-              {loading ? 'Loading...' : `${policies.length} policies found`}
-            </div>
-          </div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Restore Britain policies{' '}
+            <button
+              onClick={() => setShowInfoModal(true)}
+              className="text-gray-500 hover:text-blue-600 transition-colors inline-block align-middle"
+            >
+              <HelpCircle size={24} />
+            </button>
+          </h1>
           <p className="text-gray-600 mt-2">
             Browse and search through policies from Restore Britain's voting platform
           </p>

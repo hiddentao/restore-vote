@@ -23,4 +23,8 @@ export interface ChainContextType {
   userProfile: UserProfile | null
   login: (mnemonic: string) => Promise<void>
   logout: () => void
+  checkUserVote: (policyId: string) => Promise<void>
+  getVoteStatus: (policyId: string) => boolean | undefined
+  isCheckingVote: (policyId: string) => boolean
+  voteStatusCacheVersion: number
 }

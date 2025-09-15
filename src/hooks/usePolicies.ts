@@ -5,6 +5,8 @@ import { Policy } from "../types/Policy"
 interface ApiContextType {
   policies: Policy[]
   loading: boolean
+  isRefreshing: boolean
+  lastUpdated: number | null
   error: string | null
   refreshPolicies: () => Promise<void>
 }

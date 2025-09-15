@@ -1,3 +1,4 @@
+import { CheckCircle } from "lucide-react"
 import { Policy } from "../types/Policy"
 import { Modal } from "./Modal"
 
@@ -37,6 +38,14 @@ export function PolicyDetailsModal({
           <h2 className="text-xl font-bold text-gray-900 mb-2 mt-3">
             {policy.title}
           </h2>
+          {policy.hasUserVoted && (
+            <div className="flex items-center gap-2 mb-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <CheckCircle size={20} className="text-green-600" />
+              <span className="text-green-800 font-medium">
+                You voted for this policy
+              </span>
+            </div>
+          )}
           <div className="text-sm text-gray-600 mb-4">
             by <span className="font-medium">{policy.creator.username}</span>
           </div>

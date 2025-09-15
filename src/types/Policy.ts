@@ -26,6 +26,7 @@ export interface Policy {
   createdAt: number
   updatedAt: number
   rank?: number
+  hasUserVoted?: boolean
 }
 
 export interface PolicyApiResponse {

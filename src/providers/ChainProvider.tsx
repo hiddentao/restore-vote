@@ -37,6 +37,69 @@ export const ChainProvider: React.FC<ChainProviderProps> = ({ children }) => {
   })
 
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [voteStatusCache, setVoteStatusCache] = useState<Map<string, boolean>>(
+    new Map(),
+  )
+  const [voteStatusCacheVersion, setVoteStatusCacheVersion] = useState(0)
+  const [checkingVotes, setCheckingVotes] = useState<Set<string>>(new Set())
+
+  const checkUserVote = useCallback(
+    async (policyId: string) => {
+      if (
+        !walletState.isConnected ||
+        !walletState.address ||
+        checkingVotes.has(policyId)
+      ) {
+        return
+      }
+
+      // Add to checking set
+      setCheckingVotes((prev) => new Set(prev).add(policyId))
+
+      try {
+        const hasVoted = await chainApiService.hasUserVoted(
+          walletState.address,
+          policyId,
+        )
+
+        // Update cache
+        setVoteStatusCache((prev) => {
+          const newCache = new Map(prev)
+          newCache.set(policyId, hasVoted)
+          return newCache
+        })
+        // Increment version to notify listeners
+        setVoteStatusCacheVersion((prev) => prev + 1)
+      } catch (error) {
+        console.error(
+          `Failed to check vote status for policy ${policyId}:`,
+          error,
+        )
+      } finally {
+        // Remove from checking set
+        setCheckingVotes((prev) => {
+          const newSet = new Set(prev)
+          newSet.delete(policyId)
+          return newSet
+        })
+      }
+    },
+    [walletState.isConnected, walletState.address, checkingVotes],
+  )
+
+  const getVoteStatus = useCallback(
+    (policyId: string): boolean | undefined => {
+      return voteStatusCache.get(policyId)
+    },
+    [voteStatusCache],
+  )
+
+  const isCheckingVote = useCallback(
+    (policyId: string): boolean => {
+      return checkingVotes.has(policyId)
+    },
+    [checkingVotes],
+  )
 
   const login = useCallback(async (mnemonic: string) => {
     setWalletState((prev) => ({ ...prev, isLoading: true, error: null }))
@@ -127,6 +190,9 @@ export const ChainProvider: React.FC<ChainProviderProps> = ({ children }) => {
       error: null,
     })
     setUserProfile(null)
+    setVoteStatusCache(new Map())
+    setVoteStatusCacheVersion(0)
+    setCheckingVotes(new Set())
   }, [])
 
   // Auto-login on component mount
@@ -139,6 +205,10 @@ export const ChainProvider: React.FC<ChainProviderProps> = ({ children }) => {
     userProfile,
     login,
     logout,
+    checkUserVote,
+    getVoteStatus,
+    isCheckingVote,
+    voteStatusCacheVersion,
   }
 
   return <ChainContext.Provider value={value}>{children}</ChainContext.Provider>

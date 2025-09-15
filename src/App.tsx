@@ -10,7 +10,7 @@ import { ChainProvider } from "./providers/ChainProvider"
 import { Policy } from "./types/Policy"
 
 function AppContent() {
-  const { policies, loading, error } = usePolicies()
+  const { policies, loading, isRefreshing, lastUpdated, error } = usePolicies()
   const [selectedPolicy, setSelectedPolicy] = useState<Policy | null>(null)
   const [showInfoModal, setShowInfoModal] = useState(false)
 
@@ -79,6 +79,8 @@ function AppContent() {
         <PoliciesTable
           policies={policies}
           loading={loading}
+          isRefreshing={isRefreshing}
+          lastUpdated={lastUpdated}
           onPolicyClick={handlePolicyClick}
         />
       </div>

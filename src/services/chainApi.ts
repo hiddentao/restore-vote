@@ -1,14 +1,26 @@
-import { createWalletClient, http } from "viem"
+import {
+  createPublicClient,
+  createWalletClient,
+  encodeAbiParameters,
+  http,
+} from "viem"
 import { mnemonicToAccount } from "viem/accounts"
 import { mainnet } from "viem/chains"
-import { RPC_URL } from "../constants"
+import { RPC_URL, VOTING_CONTRACT_ADDRESS } from "../constants"
+
+// Function selector for hasUserVoted function (0x982702a8)
+const HAS_USER_VOTED_FUNCTION = "0x982702a8"
 
 export class ChainApiService {
+  private publicClient: ReturnType<typeof createPublicClient>
   private walletClient?: ReturnType<typeof createWalletClient>
   private account?: ReturnType<typeof mnemonicToAccount>
 
   constructor() {
-    // Public client removed as it's no longer needed for user profile fetching
+    this.publicClient = createPublicClient({
+      chain: mainnet,
+      transport: http(RPC_URL),
+    })
   }
 
   /**
@@ -69,6 +81,51 @@ export class ChainApiService {
     return {
       address,
       signature,
+    }
+  }
+
+  /**
+   * Check if user has voted for a specific policy
+   */
+  async hasUserVoted(
+    walletAddress: string,
+    policyId: string,
+  ): Promise<boolean> {
+    try {
+      if (!this.publicClient) {
+        throw new Error("Public client not initialized")
+      }
+
+      // Encode parameters: address + string
+      const encodedParams = encodeAbiParameters(
+        [
+          { name: "user", type: "address" },
+          { name: "policyId", type: "string" },
+        ],
+        [walletAddress as `0x${string}`, policyId],
+      )
+
+      // Combine function selector with encoded parameters
+      const data =
+        `${HAS_USER_VOTED_FUNCTION}${encodedParams.slice(2)}` as `0x${string}`
+
+      // Call the smart contract function
+      const result = await this.publicClient.call({
+        to: VOTING_CONTRACT_ADDRESS,
+        data,
+      })
+
+      // Parse the boolean result from the contract call
+      if (result?.data) {
+        // The result should be a 32-byte boolean (0x00...00 for false, 0x00...01 for true)
+        const hasVoted = result.data.slice(-2) === "01"
+        return hasVoted
+      }
+
+      return false
+    } catch (error) {
+      console.error("Error checking if user has voted:", error)
+      return false
     }
   }
 

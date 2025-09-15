@@ -73,3 +73,6 @@ npm run preview
 
 The project deploys to Cloudflare Pages after building. The README mentions historical deployment to Fleek for privacy but current setup uses Cloudflare.
 - use bun instead of npm as package manager
+- never run the dev server after making changes - i will run it manually
+- always run package.json script commands using bun
+- always use lint and format commands from package.json instead of manually running

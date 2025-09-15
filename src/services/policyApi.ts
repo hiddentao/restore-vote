@@ -1,94 +1,94 @@
-import { Policy, PolicyApiResponse } from '../types/Policy';
+import { Policy } from "../types/Policy"
 
-const BASE_URL = 'https://api.policyvoter.com/v1/policy/top/list';
-const CONSTITUENT_ID = 'UNE079UK';
+const BASE_URL = "https://api.policyvoter.com/v1/policy/top/list"
+const CONSTITUENT_ID = "UNE079UK"
 
 export class PolicyApiService {
   private async fetchPage(page: number): Promise<Policy[]> {
-    const url = `${BASE_URL}?constituentId=${CONSTITUENT_ID}&page=${page}`;
-    
+    const url = `${BASE_URL}?constituentId=${CONSTITUENT_ID}&page=${page}`
+
     try {
-      const response = await fetch(url);
+      const response = await fetch(url)
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
-      
-      const response_data = await response.json();
-      
+
+      const response_data = await response.json()
+
       // Handle the PolicyVoter API response format
       if (response_data && response_data.success && response_data.data) {
-        const data = response_data.data;
-        
+        const data = response_data.data
+
         if (data.policies && Array.isArray(data.policies)) {
-          return data.policies;
+          return data.policies
         }
       }
-      
-      return [];
+
+      return []
     } catch (error) {
-      console.error(`Failed to fetch page ${page}:`, error);
-      throw error;
+      console.error(`Failed to fetch page ${page}:`, error)
+      throw error
     }
   }
 
   async fetchAllPolicies(): Promise<Policy[]> {
-    const allPolicies: Policy[] = [];
-    let currentPage = 1;
-    const maxConcurrentRequests = 5;
-    
+    const allPolicies: Policy[] = []
+    let currentPage = 1
+    const maxConcurrentRequests = 5
+
     try {
-      const firstPage = await this.fetchPage(1);
+      const firstPage = await this.fetchPage(1)
       if (!Array.isArray(firstPage) || firstPage.length === 0) {
-        return [];
+        return []
       }
-      
-      allPolicies.push(...firstPage);
-      currentPage = 2;
-      
-      const promises: Promise<Policy[]>[] = [];
-      
+
+      allPolicies.push(...firstPage)
+      currentPage = 2
+
+      const promises: Promise<Policy[]>[] = []
+
       while (true) {
         for (let i = 0; i < maxConcurrentRequests; i++) {
-          promises.push(this.fetchPage(currentPage + i));
+          promises.push(this.fetchPage(currentPage + i))
         }
-        
-        const results = await Promise.allSettled(promises);
+
+        const results = await Promise.allSettled(promises)
         const validResults = results
-          .filter((result): result is PromiseFulfilledResult<Policy[]> => 
-            result.status === 'fulfilled' && 
-            Array.isArray(result.value) && 
-            result.value.length > 0
+          .filter(
+            (result): result is PromiseFulfilledResult<Policy[]> =>
+              result.status === "fulfilled" &&
+              Array.isArray(result.value) &&
+              result.value.length > 0,
           )
-          .map(result => result.value);
-        
+          .map((result) => result.value)
+
         if (validResults.length === 0) {
-          break;
+          break
         }
-        
-        validResults.forEach(policies => {
+
+        validResults.forEach((policies) => {
           if (Array.isArray(policies)) {
-            allPolicies.push(...policies);
+            allPolicies.push(...policies)
           }
-        });
-        
+        })
+
         if (validResults.length < maxConcurrentRequests) {
-          break;
+          break
         }
-        
-        currentPage += maxConcurrentRequests;
-        promises.length = 0;
+
+        currentPage += maxConcurrentRequests
+        promises.length = 0
       }
-      
+
       return allPolicies.map((policy, index) => ({
         ...policy,
-        rank: index + 1
-      }));
-      
+        rank: index + 1,
+      }))
     } catch (error) {
-      console.error('Error fetching policies:', error);
-      throw new Error('Failed to fetch policies. Please try again later.');
+      console.error("Error fetching policies:", error)
+      throw new Error("Failed to fetch policies. Please try again later.")
     }
   }
 }
 
-export const policyApiService = new PolicyApiService();
+export const policyApiService = new PolicyApiService()

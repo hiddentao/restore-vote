@@ -1,22 +1,26 @@
-import { Modal } from './Modal';
-import { Policy } from '../types/Policy';
+import { Policy } from "../types/Policy"
+import { Modal } from "./Modal"
 
 interface PolicyDetailsModalProps {
-  policy: Policy | null;
-  isOpen: boolean;
-  onClose: () => void;
+  policy: Policy | null
+  isOpen: boolean
+  onClose: () => void
 }
 
-export function PolicyDetailsModal({ policy, isOpen, onClose }: PolicyDetailsModalProps) {
-  if (!policy) return null;
+export function PolicyDetailsModal({
+  policy,
+  isOpen,
+  onClose,
+}: PolicyDetailsModalProps) {
+  if (!policy) return null
 
   const formatDate = (timestamp: number) => {
-    return new Date(timestamp * 1000).toLocaleDateString('en-GB', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
+    return new Date(timestamp * 1000).toLocaleDateString("en-GB", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+  }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -40,7 +44,7 @@ export function PolicyDetailsModal({ policy, isOpen, onClose }: PolicyDetailsMod
 
         <div className="border-t border-gray-200 pt-4 mb-6">
           <div className="text-gray-900 leading-relaxed whitespace-pre-wrap">
-            {policy.description.replace(/\n\s*\n\s*\n+/g, '\n\n')}
+            {policy.description.replace(/\n\s*\n\s*\n+/g, "\n\n")}
           </div>
         </div>
 
@@ -58,5 +62,5 @@ export function PolicyDetailsModal({ policy, isOpen, onClose }: PolicyDetailsMod
         </div>
       </div>
     </Modal>
-  );
+  )
 }

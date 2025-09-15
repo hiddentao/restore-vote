@@ -41,7 +41,7 @@ export const Modal: React.FC<ModalProps> = ({
     >
       <div className="relative">
         <div 
-          className="bg-white rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto relative"
+          className="bg-white rounded-lg max-w-md lg:max-w-2xl xl:max-w-4xl w-full max-h-[80vh] overflow-y-auto relative"
           onClick={(e) => e.stopPropagation()}
         >
           {children}

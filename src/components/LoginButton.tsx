@@ -22,10 +22,6 @@ export const LoginButton: React.FC = () => {
     setShowLoginModal(false)
   }
 
-  const handleUsernameClick = () => {
-    setShowProfileModal(true)
-  }
-
   const handleCloseProfileModal = () => {
     setShowProfileModal(false)
   }
@@ -39,15 +35,12 @@ export const LoginButton: React.FC = () => {
     return (
       <>
         <div className="flex items-center gap-2">
-          <button onClick={handleUsernameClick} className="rounded-full">
+          <div className="rounded-full">
             <Avatar username={username} size="sm" />
-          </button>
-          <button
-            onClick={handleUsernameClick}
-            className="text-sm text-gray-600 hover:text-gray-800 hidden sm:block transition-colors cursor-pointer"
-          >
+          </div>
+          <span className="text-sm text-gray-600 hidden sm:block">
             {displayText}
-          </button>
+          </span>
           <button
             onClick={handleLogoutClick}
             className="flex items-center gap-2 px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"

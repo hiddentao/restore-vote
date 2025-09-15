@@ -7,8 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "deploy": "npm run build"
+    "preview": "vite preview"
   },
   "dependencies": {
     "date-fns": "^4.1.0",
@@ -29,8 +28,10 @@
     "globals": "^15.9.0",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
+    "tsx": "^4.20.5",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.3.0",
+    "viem": "^2.37.5",
     "vite": "^5.4.2"
   }
 }

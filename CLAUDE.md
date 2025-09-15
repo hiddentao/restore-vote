@@ -72,3 +72,4 @@ npm run preview
 ## Deployment
 
 The project deploys to Cloudflare Pages after building. The README mentions historical deployment to Fleek for privacy but current setup uses Cloudflare.
+- use bun instead of npm as package manager

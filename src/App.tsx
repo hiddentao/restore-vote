@@ -1,7 +1,8 @@
 import { HelpCircle } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Toaster } from "react-hot-toast"
 import { Analytics } from "./analytics"
+import { CookieConsent } from "./components/CookieConsent"
 import { InfoModal } from "./components/InfoModal"
 import { LoginButton } from "./components/LoginButton"
 import { PoliciesTable } from "./components/PoliciesTable"
@@ -11,12 +12,14 @@ import { ApiProvider } from "./providers/ApiProvider"
 import { ChainProvider } from "./providers/ChainProvider"
 import { Policy } from "./types/Policy"
 
-Analytics.init()
-
 function AppContent() {
   const { policies, loading, isRefreshing, lastUpdated, error } = usePolicies()
   const [selectedPolicy, setSelectedPolicy] = useState<Policy | null>(null)
   const [showInfoModal, setShowInfoModal] = useState(false)
+
+  useEffect(() => {
+    Analytics.init()
+  }, [])
 
   const handlePolicyClick = (policy: Policy) => {
     setSelectedPolicy(policy)
@@ -100,6 +103,8 @@ function AppContent() {
         isOpen={showInfoModal}
         onClose={() => setShowInfoModal(false)}
       />
+
+      <CookieConsent />
     </div>
   )
 }

@@ -67,6 +67,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               12-word Mnemonic Phrase
             </label>
             <textarea
+              data-private="redact"
               id="mnemonic"
               value={mnemonic}
               onChange={(e) => setMnemonic(e.target.value)}

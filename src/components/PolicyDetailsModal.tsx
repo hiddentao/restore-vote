@@ -1,4 +1,4 @@
-import { Check, CheckCircle, X } from "lucide-react"
+import { Check, CheckCircle, ExternalLink, X } from "lucide-react"
 import { useChain } from "../hooks/useChain"
 import { Policy } from "../types/Policy"
 import { Button } from "./Button"
@@ -80,15 +80,30 @@ export function PolicyDetailsModal({
         </div>
 
         <div className="border-t border-gray-200 pt-4">
-          <div className="text-xs text-gray-500 space-y-0">
-            <div>
-              <span>Created: </span>
-              <span>{formatDate(policy.createdAt)}</span>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="text-xs text-gray-500 space-y-0">
+              <div>
+                <span>Created: </span>
+                <span>{formatDate(policy.createdAt)}</span>
+              </div>
+              <div>
+                <span>Updated: </span>
+                <span>{formatDate(policy.updatedAt)}</span>
+              </div>
             </div>
-            <div>
-              <span>Updated: </span>
-              <span>{formatDate(policy.updatedAt)}</span>
-            </div>
+            <Button
+              onClick={() =>
+                window.open(
+                  `https://policyvoter.com/${policy.policyId}`,
+                  "_blank",
+                )
+              }
+              variant="secondary"
+              icon={<ExternalLink size={16} />}
+              className="text-sm"
+            >
+              View on PolicyVoter
+            </Button>
           </div>
         </div>
       </div>

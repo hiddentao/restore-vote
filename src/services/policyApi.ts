@@ -150,7 +150,6 @@ export class PolicyApiService {
       }
 
       const userData = await response.json()
-      console.log("User profile data from PolicyVoter API:", userData)
 
       // Check if the response follows the PolicyVoter pattern with success/data structure
       if (userData && userData.success && userData.data) {

@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useEffect, useState } from "react"
+import React, { createContext, useCallback, useState } from "react"
 import { Analytics } from "../analytics"
 import { chainApiService } from "../services/chainApi"
 import { policyApiService } from "../services/policyApi"
@@ -15,14 +15,6 @@ const MNEMONIC_STORAGE_KEY = "restore-vote-mnemonic"
 
 const encodeMnemonic = (mnemonic: string): string => {
   return btoa(mnemonic)
-}
-
-const decodeMnemonic = (encoded: string): string => {
-  try {
-    return atob(encoded)
-  } catch {
-    throw new Error("Invalid stored mnemonic")
-  }
 }
 
 interface ChainProviderProps {
@@ -251,20 +243,6 @@ export const ChainProvider: React.FC<ChainProviderProps> = ({ children }) => {
     }
   }, [])
 
-  const initializeWallet = useCallback(async () => {
-    try {
-      const storedMnemonic = localStorage.getItem(MNEMONIC_STORAGE_KEY)
-      if (storedMnemonic) {
-        const mnemonic = decodeMnemonic(storedMnemonic)
-        await login(mnemonic)
-      }
-    } catch (error) {
-      console.warn("Could not auto-login from stored mnemonic:", error)
-      // Clear invalid stored data
-      localStorage.removeItem(MNEMONIC_STORAGE_KEY)
-    }
-  }, [login])
-
   const logout = useCallback(() => {
     // Clear stored mnemonic
     try {
@@ -288,9 +266,9 @@ export const ChainProvider: React.FC<ChainProviderProps> = ({ children }) => {
   }, [])
 
   // Auto-login on component mount
-  useEffect(() => {
-    initializeWallet()
-  }, [initializeWallet])
+  // useEffect(() => {
+  //   initializeWallet()
+  // }, [initializeWallet])
 
   const value: ChainContextType = {
     walletState,

@@ -4,7 +4,6 @@ import { Toaster } from "react-hot-toast"
 import { Analytics } from "./analytics"
 import { CookieConsent } from "./components/CookieConsent"
 import { InfoModal } from "./components/InfoModal"
-import { LoginButton } from "./components/LoginButton"
 import { PoliciesTable } from "./components/PoliciesTable"
 import { PolicyDetailsModal } from "./components/PolicyDetailsModal"
 import { usePolicies } from "./hooks/usePolicies"
@@ -13,7 +12,7 @@ import { ChainProvider } from "./providers/ChainProvider"
 import { Policy } from "./types/Policy"
 
 function AppContent() {
-  const { policies, loading, isRefreshing, lastUpdated, error } = usePolicies()
+  const { policies, loading, lastUpdated, error } = usePolicies()
   const [selectedPolicy, setSelectedPolicy] = useState<Policy | null>(null)
   const [showInfoModal, setShowInfoModal] = useState(false)
 
@@ -78,7 +77,7 @@ function AppContent() {
                 platform
               </p>
             </div>
-            <LoginButton />
+            {/* <LoginButton /> */}
           </div>
         </div>
 
@@ -86,7 +85,6 @@ function AppContent() {
         <PoliciesTable
           policies={policies}
           loading={loading}
-          isRefreshing={isRefreshing}
           lastUpdated={lastUpdated}
           onPolicyClick={handlePolicyClick}
         />

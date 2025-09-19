@@ -4,13 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "postinstall": "bun run fetch-policies",
     "dev": "vite",
     "build": "vite build",
     "lint": "tsc --noEmit --project tsconfig.app.json && biome check .",
     "lint:fix": "tsc --noEmit --project tsconfig.app.json && biome check --write .",
     "format": "biome format --write .",
     "preview": "vite preview",
-    "prepare": "husky"
+    "prepare": "husky",
+    "fetch-policies": "tsx scripts/fetch-policies.ts"
   },
   "dependencies": {
     "date-fns": "^4.1.0",

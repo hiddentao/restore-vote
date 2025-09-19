@@ -5,7 +5,6 @@ import {
   ChevronsUpDown,
   ChevronUp,
   Filter,
-  RefreshCw,
   Search,
 } from "lucide-react"
 import { useMemo, useState } from "react"
@@ -15,7 +14,6 @@ import { LoggedIn } from "./LoggedIn"
 interface PoliciesTableProps {
   policies: Policy[]
   loading: boolean
-  isRefreshing?: boolean
   lastUpdated?: number | null
   onPolicyClick: (policy: Policy) => void
 }
@@ -27,7 +25,6 @@ type VoteFilter = "all" | "voted"
 export function PoliciesTable({
   policies,
   loading,
-  isRefreshing = false,
   lastUpdated = null,
   onPolicyClick,
 }: PoliciesTableProps) {
@@ -201,8 +198,13 @@ export function PoliciesTable({
             )}
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-500">
-            {isRefreshing && (
-              <RefreshCw size={16} className="animate-spin text-blue-600" />
+            {lastUpdated && (
+              <span>
+                Last updated:{" "}
+                {formatDistanceToNow(new Date(lastUpdated), {
+                  addSuffix: true,
+                })}
+              </span>
             )}
           </div>
         </div>
@@ -324,8 +326,13 @@ export function PoliciesTable({
                 )}
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-500">
-                {isRefreshing && (
-                  <RefreshCw size={16} className="animate-spin text-blue-600" />
+                {lastUpdated && (
+                  <span>
+                    Last updated:{" "}
+                    {formatDistanceToNow(new Date(lastUpdated), {
+                      addSuffix: true,
+                    })}
+                  </span>
                 )}
               </div>
             </div>

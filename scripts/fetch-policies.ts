@@ -1,4 +1,4 @@
-import { writeFileSync } from "node:fs"
+import { mkdirSync, writeFileSync } from "node:fs"
 import { resolve } from "node:path"
 import { policyApiService } from "../src/services/policyApi.js"
 
@@ -33,7 +33,12 @@ async function fetchAndSavePolicies() {
       },
     }
 
-    const outputPath = resolve(process.cwd(), "data", "policies.json")
+    const dataDir = resolve(process.cwd(), "data")
+    const outputPath = resolve(dataDir, "policies.json")
+
+    // Ensure data directory exists
+    mkdirSync(dataDir, { recursive: true })
+
     writeFileSync(outputPath, JSON.stringify(data, null, 2))
 
     console.log(`✅ Successfully fetched ${policies.length} policies`)

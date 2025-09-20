@@ -3,7 +3,7 @@ name: Scheduled Rebuild
 on:
   workflow_dispatch:  # Allow manual triggering
   schedule:
-    - cron: '0 2 * * *'  # Run daily at 2 AM UTC
+    - cron: '15 * * * *'  # Run hourly at minute 15
 
 jobs:
   rebuild:

@@ -1,52 +1,53 @@
-# migrant-hotels-uk
+# Restore Vote
 
-To maintain privacy we deploy on [Fleek](https://fleek.xyz) and only using their CLI so there is no 
-link to Github.
-
-Live: https://
+A React application that displays policies from Restore Britain's PolicyVoter platform in a searchable table interface. Browse and explore political policies with voting data, creator information, and detailed policy descriptions.
 
 ## Development
 
-Install dependencies:
-
+**Install dependencies:**
+```bash
+bun install
 ```
-bun i
-```
 
-Run:
-
-```
+**Start development server:**
+```bash
 bun run dev
+```
+
+**Lint and format code:**
+```bash
+bun run lint      # Check for issues
+bun run lint:fix  # Fix issues automatically
+bun run format    # Format code with Biome
+```
+
+**Build for production:**
+```bash
+bun run build
+```
+
+**Preview production build:**
+```bash
+bun run preview
+```
+
+## Tech Stack
+
+- **Frontend**: React 18 + TypeScript + Vite
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **API**: PolicyVoter REST API
+- **Package Manager**: Bun
+
+## Data & Automation
+
+The application fetches policy data from the PolicyVoter API at build time and runtime. A scheduled rebuild runs hourly (at minute 15) via GitHub Actions to keep the policy data fresh.
+
+**Fetch policies manually:**
+```bash
+bun run fetch-policies
 ```
 
 ## Deployment
 
-Build:
-
-```
-bun run build
-```
-
-Then upload to Cloudflare pages.
-
-## Scripts
-
-### Grok4 Daily Task Runner
-
-A script to call the Grok4 API for daily tasks and insights.
-
-**Setup:**
-1. Get your API key from [X.AI Console](https://console.x.ai/)
-2. Set environment variable: `export GROK_API_KEY=your_api_key_here`
-
-**Usage:**
-```bash
-# Simple task with console output
-bun src/scripts/grok4-daily-task.ts "Summarize today's news about UK immigration"
-
-# Save results to JSON file
-bun src/scripts/grok4-daily-task.ts "Generate insights about migrant hotel data" results.json
-```
-
-**Environment Variables:**
-- `GROK_API_KEY` or `XAI_API_KEY` - Your Grok API key (required)
+The project deploys automatically to Cloudflare Pages. The scheduled rebuild workflow triggers hourly deployments to ensure policy data stays current.

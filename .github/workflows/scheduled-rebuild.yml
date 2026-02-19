@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: '15 * * * *'  # Run hourly at minute 15
 
+permissions:
+  contents: write
+
 jobs:
   rebuild:
     name: Trigger Cloudflare Pages Rebuild

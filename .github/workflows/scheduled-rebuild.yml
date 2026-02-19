@@ -11,6 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Write last-published date
+        run: date -u +%Y-%m-%d > last-published.txt
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add last-published.txt
+          git diff --cached --quiet || git commit -m "chore: update last-published date" && git push
+
       - name: Trigger rebuild webhook
         run: |
           curl -X POST -d "" "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/86ed652e-b47e-4123-b651-284ce8d9b828"

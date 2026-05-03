@@ -23,9 +23,8 @@ export function CookieConsent() {
       <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex-1 text-sm">
           <p>
-            We use cookies and analytics to improve your experience. By
-            accepting, you agree to our use of analytics tools including Matomo
-            and LogRocket.
+            We use analytics to improve your experience. By accepting, you agree
+            to our use of Umami for site analytics and session recording.
           </p>
         </div>
         <div className="flex gap-3">

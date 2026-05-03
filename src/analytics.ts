@@ -1,14 +1,17 @@
-import LogRocket from "logrocket"
-
 declare global {
   interface Window {
-    _paq?: any[]
+    umami?: {
+      identify: (id: string, data?: Record<string, unknown>) => void
+    }
   }
 }
 
 export class Analytics {
   private static initialized = false
   private static readonly CONSENT_KEY = "cookie-consent"
+  private static readonly UMAMI_HOST = "https://umami.hiddentao.com"
+  private static readonly UMAMI_WEBSITE_ID =
+    "cd9601d8-0a2f-41f0-ac01-af1e6956aadf"
 
   static init(): void {
     if (this.initialized) {
@@ -26,30 +29,25 @@ export class Analytics {
       return
     }
 
-    this.initLogRocket()
-    this.initMatomo()
+    this.initUmami()
     this.initialized = true
   }
 
-  private static initLogRocket(): void {
-    LogRocket.init("zjtinw/restore-vote")
-  }
+  private static initUmami(): void {
+    const tracker = document.createElement("script")
+    tracker.defer = true
+    tracker.src = `${this.UMAMI_HOST}/script.js`
+    tracker.dataset.websiteId = this.UMAMI_WEBSITE_ID
+    document.head.appendChild(tracker)
 
-  private static initMatomo(): void {
-    window._paq = window._paq || []
-    window._paq.push(["trackPageView"])
-    window._paq.push(["enableLinkTracking"])
-
-    const u = "//matomo.hiddentao.com/"
-    window._paq.push(["setTrackerUrl", u + "matomo.php"])
-    window._paq.push(["setSiteId", "4"])
-
-    const d = document
-    const g = d.createElement("script")
-    const s = d.getElementsByTagName("script")[0]
-    g.async = true
-    g.src = u + "matomo.js"
-    s.parentNode?.insertBefore(g, s)
+    const recorder = document.createElement("script")
+    recorder.defer = true
+    recorder.src = `${this.UMAMI_HOST}/recorder.js`
+    recorder.dataset.websiteId = this.UMAMI_WEBSITE_ID
+    recorder.dataset.sampleRate = "0.1"
+    recorder.dataset.maskLevel = "moderate"
+    recorder.dataset.maxDuration = "300000"
+    document.head.appendChild(recorder)
   }
 
   private static isLocalhost(): boolean {
@@ -82,7 +80,7 @@ export class Analytics {
       return
     }
 
-    LogRocket.identify(username, {
+    window.umami?.identify(username, {
       name: username,
       wallet: walletAddress,
     })
